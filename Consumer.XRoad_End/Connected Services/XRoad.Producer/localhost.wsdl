@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://producer.xroad.com" xmlns:xrd="http://x-road.eu/xsd/xroad.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://producer.xroad.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema>
+      <xsd:import schemaLocation="http://www.w3.org/2005/05/xmlmime" namespace="http://www.w3.org/2005/05/xmlmime" />
+      <xsd:import schemaLocation="http://x-road.eu/xsd/xroad.xsd" namespace="http://x-road.eu/xsd/xroad.xsd" />
+    </xsd:schema>
+    <xsd:schema targetNamespace="http://producer.xroad.com">
+      <xsd:complexType name="fault">
+        <xsd:sequence>
+          <xsd:element name="faultCode" type="xsd:string" />
+          <xsd:element name="faultString" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="Gender">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Female" />
+          <xsd:enumeration value="Male" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:complexType name="Person">
+        <xsd:sequence>
+          <xsd:element name="Pin" type="xsd:string" />
+          <xsd:element name="Name" type="xsd:string" />
+          <xsd:element name="BirthDate" type="xsd:dateTime" />
+          <xsd:element name="Gender" type="tns:Gender" />
+          <xsd:element xmime:expectedContentTypes="application/octet-stream" name="Photo" type="xsd:base64Binary" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="GetPerson">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="request" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetPersonResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="request" type="xsd:string" />
+            <xsd:choice>
+              <xsd:element name="response" type="tns:Person" />
+              <xsd:element name="fault" type="tns:fault" />
+            </xsd:choice>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="RequiredHeaders">
+    <wsdl:part name="client" element="xrd:client" />
+    <wsdl:part name="id" element="xrd:id" />
+    <wsdl:part name="issue" element="xrd:issue" />
+    <wsdl:part name="protocolVersion" element="xrd:protocolVersion" />
+    <wsdl:part name="service" element="xrd:service" />
+    <wsdl:part name="userId" element="xrd:userId" />
+  </wsdl:message>
+  <wsdl:message name="GetPerson">
+    <wsdl:part name="body" element="tns:GetPerson" />
+  </wsdl:message>
+  <wsdl:message name="GetPersonResponse">
+    <wsdl:part name="body" element="tns:GetPersonResponse" />
+  </wsdl:message>
+  <wsdl:portType name="PortTypeName">
+    <wsdl:operation name="GetPerson">
+      <wsdl:documentation>
+        <xrd:title xml:lang="RU">Сервис для выдачи персональных данных по пин</xrd:title>
+      </wsdl:documentation>
+      <wsdl:input message="tns:GetPerson" />
+      <wsdl:output message="tns:GetPersonResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BindingName" type="tns:PortTypeName">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetPerson">
+      <xrd:version>v1</xrd:version>
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="client" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="id" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="issue" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="protocolVersion" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="service" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="userId" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="client" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="id" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="issue" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="protocolVersion" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="service" use="literal" />
+        <soap:header message="tns:RequiredHeaders" part="userId" use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServiceName">
+    <wsdl:port name="PortName" binding="tns:BindingName">
+      <soap:address location="http://INSERT_CORRECT_SERVICE_URL" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
