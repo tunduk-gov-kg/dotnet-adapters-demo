@@ -294,5 +294,71 @@ app.UseXRoadLib(routeBuilder =>
 
 На этом разработка Producer заканчивается.
 
-# Разработка Consumer
+## Разработка Consumer
+
+Откройте контекстное меню проекта и нажмите кнопку "Добавить". Затем выбираете пункт "Ссылка на службу". В появившемся окне "Добавление ссылки на службу" в поле "Адрес" вставьте URL ссылку wsdl либо укажите абсолютный путь wsdl файла. Переименуйте пространство имен ServiceReference1 на Producer и нажмите OK.
+
+В обозревателе решений внутри проекта Cosumer.XRoad_Start должна появиться вкладка ConnectedServices а внутри папка Producer. В этой папке хранятся сгенерированные типы WCF.
+
+Открываем файл App.Config где хранятся настройки вашего приложения в виде XML. Там должна появиться XML структура
+
+```xml
+<system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BindingName" />
+            </basicHttpBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://INSERT_CORRECT_SERVICE_URL" binding="basicHttpBinding"
+                bindingConfiguration="BindingName" contract="Producer.PortTypeName"
+                name="PortName" />
+        </client>
+</system.serviceModel>
+```
+
+Поменяйте значение атрибута adddress="" у тега endpoint вписав туда URL вашего сервера безопасности.
+
+Далее создайте класс XRoadPersonDataManager и реализуйте интерфейс IPersonDataManager, в методе GetPerson сформируйте запрос как показано на примере:
+
+ 
+
+```c#
+public PersonData GetPersonData(string pin)
+{
+    PortTypeNameClient client = new PortTypeNameClient();
+    var getPersonRequest = new GetPersonRequest();
+    getPersonRequest.id = Guid.NewGuid().ToString();
+    getPersonRequest.userId = "Sample User id";
+    getPersonRequest.issue = "Sample issue";
+    getPersonRequest.protocolVersion = "4.0";
+    getPersonRequest.client = new XRoadClientIdentifierType()
+    {
+        xRoadInstance = "ЭКЗЕМПЛЯР XROAD",
+        memberClass = "КЛАСС УЧАСТНИКА XROAD",
+        memberCode = "КОД УЧАСТНИКА"
+    };
+    getPersonRequest.service = new XRoadServiceIdentifierType()
+    {
+        xRoadInstance = "ЭКЗЕМПЛЯР XROAD",
+        memberClass = "КЛАСС УЧАСТНИКА XROAD",
+        memberCode = "КОД УЧАСТНИКА"
+        serviceCode = "GetPerson",
+        serviceVersion = "v1"
+    };
+    getPersonRequest.GetPerson = new GetPerson()
+    {
+        request = pin
+    };
+    
+    GetPersonResponse1 response1 = client.GetPerson(getPersonRequest);
+    var item = response1.GetPersonResponse.Item;
+	if (item is fault)
+	{
+    	throw new ApplicationException( (item as fault).faultString);
+    }
+	return ConvertToPersonData(item);
+}
+
+```
 
